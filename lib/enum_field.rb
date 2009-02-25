@@ -25,13 +25,19 @@ module EnumField
     #   - standby?
     #   - sleep?
     #   - out_of_this_world?
+    # - use :prefix => true to get the following query methods instead (useful on models with multiple enum_fields):
+    #   - status_on?
+    #   - status_off?
+    #   - ...
     # - define the STATUSES constant, which contains the acceptable values
     def enum_field(field, possible_values, options={})
       message = options[:message] || "invalid #{field}"
+      prefix = options[:prefix] ? "#{field}_" : ""
       const_set( field.to_s.pluralize.upcase, possible_values).freeze unless const_defined?(field.to_s.pluralize.upcase)
   
       possible_values.each do |current_value|
-        method_name = current_value.downcase.gsub(/[-\s]/, '_')
+        suffix = current_value.downcase.gsub(/[-\s]/, '_')
+        method_name = "#{prefix}#{suffix}"
         define_method("#{method_name}?") do
           self.send(field) == current_value
         end

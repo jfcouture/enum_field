@@ -107,5 +107,22 @@ class EnumFieldTest < Test::Unit::TestCase
       assert_respond_to @model, :other?
     end
   end
+  
+  context "With the prefix option" do
+    setup do
+      @possible_values = %w(on off)
+      MockedModel.expects(:validates_inclusion_of)
+      MockedModel.send(:enum_field, :status, @possible_values, :prefix => true)
+    end
+    
+    should "create query methods prefixed with the field name" do
+      model = MockedModel.new
+      
+      model.stubs(:status).returns("on")
+      assert model.status_on?
+      assert !model.status_off?
+    end
+  end
+  
 end
 
