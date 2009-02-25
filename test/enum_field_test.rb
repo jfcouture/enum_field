@@ -22,6 +22,12 @@ class EnumFieldTest < Test::Unit::TestCase
       assert_equal @possible_values, MockedModel::GENDERS
     end
     
+    should "freeze the constant to prevent modifications" do
+      assert_raise TypeError do
+        MockedModel::GENDERS << "not a man, not a woman"
+      end
+    end
+    
     should "create query methods for each enum type" do
       model = MockedModel.new
       
@@ -36,6 +42,7 @@ class EnumFieldTest < Test::Unit::TestCase
     should "extend active record base with method" do
       assert_respond_to ActiveRecord::Base, :enum_field
     end
+    
   end
 
   context "Specifying a message" do
