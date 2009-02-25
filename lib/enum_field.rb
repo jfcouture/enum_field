@@ -30,6 +30,7 @@ module EnumField
     #   - status_off?
     #   - ...
     # - define the STATUSES constant, which contains the acceptable values
+    # - define named_scopes for each values
     def enum_field(field, possible_values, options={})
       message = options[:message] || "invalid #{field}"
       prefix = options[:prefix] ? "#{field}_" : ""
@@ -41,6 +42,7 @@ module EnumField
         define_method("#{method_name}?") do
           self.send(field) == current_value
         end
+        named_scope method_name.to_sym, :conditions => { field.to_sym => current_value }
       end
   
       validates_inclusion_of field, :in => possible_values, :message => message

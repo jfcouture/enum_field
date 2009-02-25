@@ -14,6 +14,9 @@ class EnumFieldTest < Test::Unit::TestCase
   context "with a simple gender enum" do
     setup do
       @possible_values = %w( male female )
+
+      MockedModel.expects(:named_scope).with(:male, :conditions => {:gender => "male"})
+      MockedModel.expects(:named_scope).with(:female, :conditions => {:gender => "female"})
       MockedModel.expects(:validates_inclusion_of).with(:gender, :in => @possible_values, :message => "invalid gender")
       MockedModel.send(:enum_field, :gender, @possible_values)
     end
@@ -39,6 +42,10 @@ class EnumFieldTest < Test::Unit::TestCase
       assert model.female?
     end
     
+    should "add named scopes for each enum type" do
+      # MockedModel.expects(:named_scope).with(:male, :conditions => {:gender => :male})
+    end
+    
     should "extend active record base with method" do
       assert_respond_to ActiveRecord::Base, :enum_field
     end
@@ -48,6 +55,7 @@ class EnumFieldTest < Test::Unit::TestCase
   context "Specifying a message" do
     setup do
       @possible_values = %w(on off)
+      MockedModel.stubs(:named_scope)
       MockedModel.expects(:validates_inclusion_of).with(:status, :in => @possible_values, :message => "custom insult")
     end
 
@@ -59,6 +67,7 @@ class EnumFieldTest < Test::Unit::TestCase
   context "With an enum containing multiple word choices" do
     setup do
       MockedModel.stubs(:validates_inclusion_of)
+      MockedModel.stubs(:named_scope)
       MockedModel.send :enum_field, :field, ['choice one', 'choice-two', 'other']
       @model = MockedModel.new
     end
@@ -75,6 +84,7 @@ class EnumFieldTest < Test::Unit::TestCase
   context "With an enum containing mixed case choices" do
     setup do
       MockedModel.stubs(:validates_inclusion_of)
+      MockedModel.stubs(:named_scope)
       MockedModel.send :enum_field, :field, ['Choice One', 'ChoiceTwo', 'Other']
       @model = MockedModel.new
     end
@@ -91,6 +101,7 @@ class EnumFieldTest < Test::Unit::TestCase
   context "With an enum containing strange characters" do
     setup do
       MockedModel.stubs(:validates_inclusion_of)
+      MockedModel.stubs(:named_scope)
       MockedModel.send :enum_field, :field, ['choice%one', 'choice☺two', 'other.']
       @model = MockedModel.new
     end
@@ -112,6 +123,7 @@ class EnumFieldTest < Test::Unit::TestCase
     setup do
       @possible_values = %w(on off)
       MockedModel.expects(:validates_inclusion_of)
+      MockedModel.stubs(:named_scope)
       MockedModel.send(:enum_field, :status, @possible_values, :prefix => true)
     end
     
